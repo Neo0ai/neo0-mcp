@@ -1,101 +1,103 @@
-# Neo0 백서
+# Neo0 Whitepaper
 
-**의미에 불변 좌표 주소를 부여하는 인프라**
-— AI의 기억과 지식과 프라이버시를, 벡터가 아니라 좌표로.
+**Infrastructure that gives meaning an immutable coordinate address**
+— AI memory, knowledge, and privacy as coordinates, not vectors.
 
----
-
-## 한 줄 요약
-
-Neo0는 모든 개념에 **재귀 분할 좌표 격자 위의 불변 주소**를 부여합니다. 의미가 가까운 개념은 좌표 접두를 공유해 같은 "영토"에 모이고, 그 좌표가 곧 의미·주소·라우팅·거버넌스의 단위가 됩니다. 별도의 온톨로지 그래프나 매번 재계산되는 불투명한 벡터 없이, 의미를 한 번 계산해 **읽을 수 있는 좌표로 고정**합니다.
+> 한국어 백서: [WHITEPAPER.ko.md](WHITEPAPER.ko.md)
 
 ---
 
-## 1. 문제 — 의미는 다루기 어렵다
+## One-line summary
 
-오늘날 LLM은 의미를 고차원 벡터로 표현합니다. 강력하지만, 다음이 어렵습니다.
-
-- **영속성**: 벡터는 매 세션·매 모델마다 다시 만들어지고, 그 자체로는 안정적인 식별자가 아닙니다.
-- **공유**: 모델 A의 벡터 공간과 모델 B의 벡터 공간은 호환되지 않아, AI 사이에 기억을 공유하기 어렵습니다.
-- **설명가능성**: 1,536차원 벡터는 사람이 읽을 수 없습니다. "이게 왜 여기 있는가"를 보여줄 주소가 없습니다.
-- **잊힐 권리**: 특정 의미를 *검증 가능하게* 삭제하는 메커니즘이 없습니다.
-
-벡터 데이터베이스는 검색을 빠르게 하지만, 이 네 문제를 풀지 못합니다 — 위치를 인덱싱할 뿐, **불변 주소와 계층 구조**를 부여하지 않기 때문입니다.
+Neo0 assigns every concept an **immutable address on a recursively partitioned coordinate lattice**. Concepts close in meaning share a coordinate prefix and gather in the same "territory," and that coordinate becomes the unit of meaning, address, routing, and governance. With no separate ontology graph and no opaque vectors recomputed every time, meaning is computed once and **fixed into a readable coordinate**.
 
 ---
 
-## 2. Neo0 — 의미를 좌표로 결정화
+## 1. The problem — meaning is hard to handle
 
-Neo0는 의미 벡터를 **재귀적으로 분할된 좌표 격자의 불변 주소**로 변환합니다.
+Today's LLMs represent meaning as high-dimensional vectors. Powerful, but the following are hard:
 
-- 가까운 의미 → 가까운 좌표 (접두 공유 = 같은 영토)
-- 주소는 한 번 발급되면 변하지 않음 (immutable registry, 드리프트 0)
-- 좌표 그 자체가 의미이자 주소이자 라우팅 경로이자 거버넌스 단위
+- **Persistence**: vectors are regenerated per session and per model, and on their own are not stable identifiers.
+- **Sharing**: model A's vector space and model B's vector space are incompatible, making it hard to share memory between AIs.
+- **Explainability**: a 1,536-dimensional vector is not human-readable. There is no address to show "why is this here."
+- **Right to be forgotten**: there is no mechanism to *verifiably* delete a specific meaning.
 
-즉 의미를 "검색만 가능한 점"이 아니라 **읽고 공유하고 통제할 수 있는 주소**로 만듭니다.
+Vector databases make search fast but do not solve these four — they index location but do not assign an **immutable address and hierarchy**.
 
 ---
 
-## 3. 작동 원리
+## 2. Neo0 — crystallizing meaning into coordinates
+
+Neo0 converts a meaning vector into an **immutable address on a recursively partitioned coordinate lattice**.
+
+- Close meaning → close coordinate (shared prefix = same territory)
+- Once issued, an address never changes (immutable registry, zero drift)
+- The coordinate itself is meaning, address, routing path, and governance unit
+
+In short, it turns meaning from a "searchable point" into a **readable, shareable, controllable address**.
+
+---
+
+## 3. How it works
 
 ```
-임베딩  →  밀도 정렬 분할  →  재귀 좌표  →  불변 레지스트리
-(의미 벡터)   (구면 보로노이)    (계층 주소)     (드리프트 0)
+embedding   →  density-aligned partition  →  recursive coordinate  →  immutable registry
+(meaning vec)   (spherical Voronoi)           (hierarchical address)    (zero drift)
 ```
 
-실제 예시 (Neo0 엔진의 측정값):
+Real example (measured by the Neo0 engine):
 
-| 개념 | 좌표 주소 | 영토 | 같은 영토의 이웃 |
+| Concept | Coordinate | Territory | Neighbors in the same territory |
 |---|---|---|---|
-| ocean | `[3, 4, 5]` | `3.4` 자연·물질 | sea, water, fish, mountain, forest, snow |
-| king | `[2, 6, ·]` | `2.6` 인물·지명 | david, moses, jerusalem, solomon, pharaoh |
-| love | `[0, 6, ·]` | `0.6` 감정·도덕 | desire, hate, wise, noble, pity, bless |
+| ocean | `[3, 4, 5]` | `3.4` Nature·Matter | sea, water, fish, mountain, forest, snow |
+| king | `[2, 6, ·]` | `2.6` People·Places | david, moses, jerusalem, solomon, pharaoh |
+| love | `[0, 6, ·]` | `0.6` Emotion·Morality | desire, hate, wise, noble, pity, bless |
 
-`ocean`과 `sea`, `water`, `fish`가 같은 영토 `3.4`에 모이는 것은 우연이 아니라, **의미의 근접성이 좌표의 근접성으로 그대로 옮겨졌기** 때문입니다.
-
----
-
-## 4. 차별점
-
-**벡터 데이터베이스 대비** — 벡터DB는 유사도 검색을 제공하지만 개념에 안정적 주소가 없고 내부가 불투명합니다. Neo0는 불변 주소 + 사람이 읽는 계층 구조를 부여합니다.
-
-**온톨로지(지식그래프) 대비** — 온톨로지는 사람이 개념과 관계를 수작업으로 구축합니다. Neo0는 임베딩에서 **자동으로** 좌표 구조를 만들며, 접두 계층이 사실상 기하학적 온톨로지 역할을 합니다.
-
-한 줄로: 경쟁 접근이 *의미를 연결하거나 검색*한다면, Neo0는 *의미를 좌표로 고정*해 표현·주소·거버넌스를 하나로 합칩니다.
+That `ocean`, `sea`, `water`, and `fish` gather in the same territory `3.4` is not coincidence — the **proximity of meaning is carried directly into the proximity of coordinates**.
 
 ---
 
-## 5. 활용 사례
+## 4. What makes it different
 
-- **MCP 플러그인으로 즉시 연결** — Claude를 비롯한 이기종 LLM이 Neo0 MCP 서버에 연결만 하면, 내부 가중치 변경 없이 즉각 좌표 기억을 공유하고 영토 페르소나를 스위칭
-- **AI 영속·공유 메모리** — 이종 모델이 같은 숫자 좌표를 공유해 기억을 주고받음
-- **검증 가능한 잊힐 권리** — 좌표 구역 단위 암호학적 소거로, 복원 불가능하고 감사 가능한 삭제
-- **설명 가능한 검색·라우팅** — 좌표 접두가 "어느 의미 영역인지"를 직접 노출
-- **모델별 페르소나 제어** — 좌표 영토의 응집도에 따라 발현 강도·온도를 조정
+**Versus vector databases** — a vector DB offers similarity search but gives concepts no stable address and is internally opaque. Neo0 adds an immutable address plus a human-readable hierarchy.
 
----
+**Versus ontologies (knowledge graphs)** — an ontology is built by hand, one concept and relation at a time. Neo0 builds the coordinate structure **automatically** from embeddings, and the prefix hierarchy effectively serves as a geometric ontology.
 
-## 6. 기술 검증
-
-- **실측 우위**: 밀도 정렬 분할이 무작위 분할 대비 버킷 재현율에서 우수 (recall@bucket 0.47 vs 0.18)
-- **불변성**: 레지스트리 주소 드리프트 0퍼센트
-- **라이브 운영**: 좌표 엔진을 감싼 MCP 서버가 실제 가동 중이며, Claude를 비롯한 MCP 클라이언트에서 직접 호출 가능
-- **분리 검증**: 엔진(비공개)과 공개 인터페이스를 분리해, 외부 호출이 전 경로를 거쳐 정상 동작함을 확인
+In one line: where competing approaches *connect or search* meaning, Neo0 *fixes meaning into coordinates*, unifying representation, addressing, and governance.
 
 ---
 
-## 7. 지식재산
+## 5. Use cases
 
-Neo0의 좌표 인프라는 **2002년 등록된 재귀 공간 분할 원천 특허**에서 출발해, 2026년까지 다수의 후속 특허로 확장되었습니다(밀도 정렬 분할, 불변 레지스트리, 좌표 단위 암호학적 소거, 모델별 페르소나 제어 등 핵심 메커니즘 포함).
-
-채택과 보호를 동시에 달성하기 위해 **오픈코어** 구조를 취합니다. 좌표의 *해석*(MCP 인터페이스·클라이언트 SDK)은 오픈소스로 개방하고, 좌표의 *생성과 응집도 연산*(분할·불변 레지스트리·페르소나 엔진)은 호스팅 서비스로 보호합니다. 인터페이스를 누가 포크해도 엔진 없이는 빈 껍데기이므로, 생태계 채택은 최대화하면서 핵심 IP는 지킵니다.
+- **Instant connection as an MCP plugin** — heterogeneous LLMs, Claude included, connect to the Neo0 MCP server and immediately share coordinate memory and switch territory personas, with no change to internal weights
+- **Persistent, shared AI memory** — heterogeneous models share the same numeric coordinates to exchange memory
+- **Verifiable right to be forgotten** — cryptographic erasure by coordinate zone, giving unrecoverable and auditable deletion
+- **Explainable search and routing** — the coordinate prefix directly reveals "which region of meaning"
+- **Per-model persona control** — expression strength and temperature adjusted by the coherence of a coordinate territory
 
 ---
 
-## 8. 현황과 로드맵
+## 6. Technical validation
 
-- **지금** — 라이브 좌표 엔진 + 공개 MCP 인터페이스(오픈코어)
-- **다음** — 커넥터 디렉토리 등재를 통한 채택 확대, 파트너십, 좌표 위 추론 레이어 확장
+- **Measured advantage**: density-aligned partitioning outperforms random partitioning in bucket recall (recall@bucket 0.47 vs 0.18)
+- **Immutability**: zero percent address drift in the registry
+- **Live operation**: an MCP server wrapping the coordinate engine is running and callable directly from MCP clients including Claude
+- **Separation verified**: the engine (private) and the public interface are separated, and external calls are confirmed to work end to end through the full path
+
+---
+
+## 7. Intellectual property
+
+Neo0's coordinate infrastructure originates from a **recursive spatial partitioning patent registered in 2002** and has expanded through numerous subsequent patents up to 2026 (covering core mechanisms including density-aligned partitioning, the immutable registry, cryptographic erasure by coordinate, and per-model persona control).
+
+To achieve adoption and protection at once, it takes an **open-core** structure. The *interpretation* of coordinates (the MCP interface and client SDK) is open source, while the *generation* of coordinates and coherence computation (partitioning, the immutable registry, the persona engine) is protected as a hosted service. Forking the interface yields an empty shell without the engine, so ecosystem adoption is maximized while the core IP is protected.
+
+---
+
+## 8. Status and roadmap
+
+- **Now** — a live coordinate engine plus a public MCP interface (open-core)
+- **Next** — wider adoption via connector directory listing, partnerships, and a reasoning layer on top of coordinates
 
 ---
 
