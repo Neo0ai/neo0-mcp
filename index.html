@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neo0 — 의미의 좌표</title>
+<style>
+  :root{
+    --ink:#070b18; --ink2:#0d1530; --line:rgba(255,255,255,.08);
+    --text:#e8ecf6; --dim:#8a93ad; --faint:#5a6582;
+    --nature:#4fd1c5; --people:#f6ad55; --nation:#b794f6; --feeling:#fc8181;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI","Noto Sans KR",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:radial-gradient(1200px 800px at 30% -10%,#101a3a 0%,var(--ink) 55%);
+    color:var(--text); font-family:var(--sans);
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:32px 20px 48px}
+  header{margin-bottom:18px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--dim)}
+  h1{font-size:clamp(28px,5vw,44px);font-weight:680;letter-spacing:-.02em;
+    margin:6px 0 8px;line-height:1.05}
+  h1 .addr{font-family:var(--mono);color:var(--nature);font-weight:600}
+  .lede{color:var(--dim);font-size:clamp(14px,2.2vw,16px);max-width:60ch;line-height:1.55}
+  .search{margin:20px 0 14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .search input{
+    background:var(--ink2);border:1px solid var(--line);color:var(--text);
+    font-family:var(--mono);font-size:14px;padding:11px 14px;border-radius:10px;
+    width:260px;max-width:100%;outline:none}
+  .search input:focus{border-color:var(--nature);box-shadow:0 0 0 3px rgba(79,209,197,.15)}
+  .hint{font-size:12.5px;color:var(--faint)}
+  .stage{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start}
+  @media(max-width:780px){.stage{grid-template-columns:1fr}}
+  .mapcard{background:linear-gradient(180deg,rgba(20,28,56,.6),rgba(10,15,32,.6));
+    border:1px solid var(--line);border-radius:16px;overflow:hidden;position:relative}
+  svg{display:block;width:100%;height:auto;touch-action:manipulation}
+  .legend{position:absolute;left:12px;top:12px;display:flex;flex-direction:column;gap:6px;
+    font-family:var(--mono);font-size:11.5px}
+  .legend div{display:flex;align-items:center;gap:7px;color:var(--dim)}
+  .dot{width:8px;height:8px;border-radius:50%}
+  .panel{background:var(--ink2);border:1px solid var(--line);border-radius:16px;
+    padding:18px;min-height:200px;position:sticky;top:20px}
+  .panel .ph{font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--faint)}
+  .word{font-size:26px;font-weight:680;margin:8px 0 2px;letter-spacing:-.01em}
+  .coord{font-family:var(--mono);font-size:15px;margin:4px 0 14px}
+  .terrlabel{display:inline-flex;align-items:center;gap:7px;font-size:13px;
+    padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.05);
+    border:1px solid var(--line);color:var(--text)}
+  .sub{color:var(--dim);font-size:13px;margin:14px 0 8px;line-height:1.5}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-family:var(--mono);font-size:12px;padding:4px 9px;border-radius:8px;
+    background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--dim);
+    cursor:pointer;transition:.15s}
+  .chip:hover{color:var(--text);border-color:rgba(255,255,255,.25)}
+  .empty{color:var(--faint);font-size:14px;line-height:1.6;margin-top:10px}
+  .gauges{margin:14px 0 4px;display:flex;flex-direction:column;gap:11px}
+  .gauge .gl{display:flex;justify-content:space-between;align-items:baseline;
+    font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-bottom:5px}
+  .gauge .gl b{color:var(--text);font-size:13px}
+  .gtrack{height:6px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
+  .gfill{height:100%;border-radius:99px;transition:width .45s ease}
+  footer{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);
+    color:var(--faint);font-size:12.5px;line-height:1.6;font-family:var(--mono)}
+  .node{cursor:pointer}
+  .nlabel{font-family:var(--mono);font-size:10px;fill:var(--dim);pointer-events:none;
+    opacity:0;transition:opacity .15s}
+  @media(prefers-reduced-motion:no-preference){
+    .pulse{animation:pulse 1.6s ease-out infinite}
+    @keyframes pulse{0%{r:6;opacity:.9}70%{r:22;opacity:0}100%{opacity:0}}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Neo0 · semantic coordinate engine</div>
+    <h1>의미가 좌표를 만든다 <span class="addr">[3,4,5]</span></h1>
+    <p class="lede">Neo0는 모든 개념에 <b>불변 좌표 주소</b>를 부여합니다. 의미가 가까운 단어는
+      좌표 접두가 같아 같은 <b>영토</b>에 모입니다. 아래는 실제 Neo0 엔진의 4000개 개념 중
+      네 의미 영토입니다. 별 하나를 눌러 보세요.</p>
+  </header>
+
+  <div class="search">
+    <input id="q" type="text" placeholder="단어 검색 — 예: water, moses, love" autocomplete="off" spellcheck="false">
+    <span class="hint">또는 성운의 별을 직접 클릭</span>
+  </div>
+
+  <div class="stage">
+    <div class="mapcard">
+      <div class="legend" id="legend"></div>
+      <svg id="map" viewBox="0 0 800 600" aria-label="의미 좌표 성운"></svg>
+    </div>
+    <aside class="panel" id="panel">
+      <div class="ph">선택된 개념</div>
+      <div class="empty">아직 선택된 개념이 없습니다.<br>성운에서 별을 클릭하거나 위에서 단어를 검색하면,
+        그 단어의 좌표 영토와 의미가 가까운 이웃이 여기에 나타납니다.</div>
+    </aside>
+  </div>
+
+  <footer>
+    실제 측정값입니다 · 접두 영토(앞 두 자리)는 Neo0 엔진이 산출한 좌표 · 같은 영토 = 의미 근접<br>
+    derive_address / semantic_region 도구의 실제 응답으로 구성
+  </footer>
+</div>
+
+<script>
+const T = {
+  "3.4":{name:"자연 · 물질", color:"var(--nature)", hex:"#4fd1c5", cx:210, cy:190,
+    anchor:"ocean", full:"[3, 4, 5]", coh:0.551, temp:0.51,
+    words:["ocean","sea","water","fish","tree","mountain","forest","snow","rock","stone","iron","silver","wood","flowers","hills","beasts","branches","river","wings"]},
+  "2.6":{name:"인물 · 지명", color:"var(--people)", hex:"#f6ad55", cx:590, cy:190,
+    anchor:"king", full:"[2, 6, ·]", coh:0.638, temp:0.45,
+    words:["king","people","son","city","david","moses","jerusalem","judah","saul","jacob","aaron","solomon","joseph","babylon","pharaoh","abraham","temple","army","prophet"]},
+  "6.4":{name:"국가 · 연결어", color:"var(--nation)", hex:"#b794f6", cx:210, cy:420,
+    anchor:"the", full:"[6, 4, 5]", coh:0.479, temp:0.56,
+    words:["the","and","by","to","also","norway","canada","australia","italy","spain","hong","kong"]},
+  "0.6":{name:"감정 · 도덕", color:"var(--feeling)", hex:"#fc8181", cx:590, cy:420,
+    anchor:"love", full:"[0, 6, ·]", coh:0.596, temp:0.48,
+    words:["love","desire","hate","wise","wicked","noble","pity","pray","bless","rejoice","fool","worthy","neither","thee","shall"]}
+};
+
+const GOLD = 2.399963;
+const nodes = [];
+for(const key in T){
+  const t = T[key];
+  t.words.forEach((w,i)=>{
+    const r = 16 + Math.sqrt(i)*21;
+    const a = i*GOLD;
+    nodes.push({word:w, terr:key,
+      x: t.cx + r*Math.cos(a),
+      y: t.cy + r*Math.sin(a),
+      hex: t.hex, anchor: w===t.anchor});
+  });
+}
+
+const svg = document.getElementById('map');
+const SVGNS = "http://www.w3.org/2000/svg";
+function el(n,attrs){const e=document.createElementNS(SVGNS,n);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+
+// links layer (constellation), drawn first
+const linkLayer = el('g',{}); svg.appendChild(linkLayer);
+const pulseLayer = el('g',{}); svg.appendChild(pulseLayer);
+const nodeLayer = el('g',{}); svg.appendChild(nodeLayer);
+
+// faint territory halos
+for(const key in T){
+  const t=T[key];
+  const halo = el('circle',{cx:t.cx,cy:t.cy,r:118,fill:t.hex,opacity:.05});
+  linkLayer.appendChild(halo);
+  const lab = el('text',{x:t.cx,y:t.cy-132,'text-anchor':'middle',
+    'font-family':'var(--mono)','font-size':12,fill:t.hex,opacity:.65});
+  lab.textContent = key+"  "+t.name;
+  linkLayer.appendChild(lab);
+}
+
+const nodeEls = {};
+nodes.forEach(nd=>{
+  const g = el('g',{class:'node'});
+  const c = el('circle',{cx:nd.x,cy:nd.y,r:nd.anchor?5.5:3.4,
+    fill:nd.hex, opacity:nd.anchor?1:.7,
+    stroke:nd.anchor?'#fff':'none','stroke-width':nd.anchor?1.2:0});
+  const lab = el('text',{x:nd.x,y:nd.y-9,'text-anchor':'middle',class:'nlabel'});
+  lab.textContent = nd.word;
+  g.appendChild(c); g.appendChild(lab);
+  g.addEventListener('mouseenter',()=>lab.style.opacity=1);
+  g.addEventListener('mouseleave',()=>{if(selected!==nd.word)lab.style.opacity=0;});
+  g.addEventListener('click',()=>select(nd.word));
+  nodeLayer.appendChild(g);
+  nd._c=c; nd._lab=lab;
+  nodeEls[nd.word]=nd;
+});
+
+// legend
+const lg = document.getElementById('legend');
+for(const key in T){const t=T[key];
+  const d=document.createElement('div');
+  d.innerHTML='<span class="dot" style="background:'+t.hex+'"></span>'+key+' '+t.name;
+  lg.appendChild(d);
+}
+
+function gauge(label, val, min, max, color, note){
+  const pct=Math.max(2,Math.min(100,(val-min)/(max-min)*100));
+  return '<div class="gauge"><div class="gl"><span>'+label+
+    (note?' <span style="color:var(--faint)">'+note+'</span>':'')+
+    '</span><b>'+val.toFixed(3)+'</b></div>'+
+    '<div class="gtrack"><div class="gfill" style="width:'+pct+'%;background:'+color+'"></div></div></div>';
+}
+let selected=null;
+function clearFx(){
+  linkLayer.querySelectorAll('.clink').forEach(e=>e.remove());
+  pulseLayer.innerHTML='';
+  nodes.forEach(nd=>{
+    nd._c.setAttribute('opacity', nd.anchor?1:.7);
+    nd._c.setAttribute('r', nd.anchor?5.5:3.4);
+    if(nd.word!==selected) nd._lab.style.opacity=0;
+  });
+}
+
+function select(word){
+  const nd = nodeEls[word];
+  if(!nd){return;}
+  selected=word;
+  clearFx();
+  const t=T[nd.terr];
+  const peers=nodes.filter(n=>n.terr===nd.terr && n.word!==word);
+
+  // constellation lines to peers
+  peers.forEach(p=>{
+    const ln=el('line',{x1:nd.x,y1:nd.y,x2:p.x,y2:p.y,class:'clink',
+      stroke:t.hex,'stroke-width':.7,opacity:.35});
+    linkLayer.appendChild(ln);
+  });
+  // dim other territories
+  nodes.forEach(n=>{
+    if(n.terr!==nd.terr){n._c.setAttribute('opacity',.18);}
+    else{n._c.setAttribute('opacity',.95);}
+  });
+  // highlight selected
+  nd._c.setAttribute('r',7);
+  nd._c.setAttribute('opacity',1);
+  nd._lab.style.opacity=1;
+  const pc=el('circle',{cx:nd.x,cy:nd.y,r:6,fill:'none',
+    stroke:t.hex,'stroke-width':1.5,class:'pulse'});
+  pulseLayer.appendChild(pc);
+
+  // panel
+  const addr = word===t.anchor ? t.full :
+    "["+t.name.split(' ')[0]+" 영토 "+nd.terr+"]";
+  const fullShown = word===t.anchor ? t.full : nd.terr+" · ?";
+  const peerWords = peers.slice(0,10).map(p=>p.word);
+  document.getElementById('panel').innerHTML =
+    '<div class="ph">선택된 개념</div>'+
+    '<div class="word">'+word+'</div>'+
+    '<div class="coord" style="color:'+t.hex+'">'+
+      (word===t.anchor? '좌표 주소 '+t.full : '접두 영토 '+nd.terr)+'</div>'+
+    '<span class="terrlabel"><span class="dot" style="background:'+t.hex+'"></span>'+
+      nd.terr+' · '+t.name+'</span>'+
+    '<div class="gauges">'+
+      gauge('영토 응집도', t.coh, 0, 1, t.hex)+
+      gauge('권장 생성 온도', t.temp, 0.2, 0.9, t.hex, '낮을수록 일관')+
+    '</div>'+
+    '<div class="sub">같은 영토의 이웃 — 의미가 가까워 좌표 접두를 공유합니다:</div>'+
+    '<div class="chips">'+peerWords.map(w=>'<span class="chip" data-w="'+w+'">'+w+'</span>').join('')+'</div>';
+  document.querySelectorAll('.chip').forEach(ch=>
+    ch.addEventListener('click',()=>select(ch.dataset.w)));
+}
+
+// search
+document.getElementById('q').addEventListener('input',e=>{
+  const v=e.target.value.trim().toLowerCase();
+  if(!v){return;}
+  const hit=nodes.find(n=>n.word.toLowerCase()===v) ||
+            nodes.find(n=>n.word.toLowerCase().startsWith(v));
+  if(hit) select(hit.word);
+});
+document.getElementById('q').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const v=e.target.value.trim().toLowerCase();
+    const hit=nodes.find(n=>n.word.toLowerCase().startsWith(v));
+    if(hit) select(hit.word);
+  }
+});
+
+// start with the anchor of nature
+select('ocean');
+</script>
+</body>
+</html>
