@@ -1,6 +1,7 @@
 # Neo0 MCP
 
 ### 🚀 [Try the live demo](https://neo0ai.github.io/neo0-mcp/) · 📄 [Read the whitepaper](WHITEPAPER.md)
+<img width="1342" height="1141" alt="neo0mcp" src="https://github.com/user-attachments/assets/11e7ee2e-d4ca-4f4b-abbf-bbd0c0044530" />
 
 Coordinate-based semantic addressing for AI agents, exposed over the **Model Context Protocol (MCP)**.
 
