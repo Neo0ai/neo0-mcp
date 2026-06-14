@@ -1,5 +1,7 @@
 # Neo0 MCP
 
+### 🚀 [Try the live demo](https://neo0ai.github.io/neo0-mcp/) · 📄 [Read the whitepaper](WHITEPAPER.md)
+
 Coordinate-based semantic addressing for AI agents, exposed over the **Model Context Protocol (MCP)**.
 
 Neo0 assigns every concept an **immutable coordinate address** in a recursively partitioned semantic space. Concepts that are close in meaning share a coordinate prefix, so the address itself encodes meaning, location, and routing — no separate ontology graph required.
