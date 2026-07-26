@@ -53,10 +53,11 @@ In Claude: **Settings → Connectors → Add custom connector**, then enter your
 
 ## License
 
-This MCP shell is licensed under **Apache-2.0** (see `LICENSE`).
+This MCP shell is provided for **evaluation only** — see [LICENSE](LICENSE).
+**No patent license is granted by this repository; rights are reserved.**
 
-The Neo0 coordinate engine is **patent-pending** and provided as a hosted API under separate terms. Use of the API includes a license to the relevant patents; independently reimplementing the engine is not covered by this repository's license.
+The Neo0 coordinate engine is patent-pending and provided as a hosted API
+under separate terms. Use of the API may include a limited patent license;
+independently reimplementing the engine is not covered.
 
----
-
-Built by Neo0 — https://neo0.ai
+© 2026 Seungchul Lee — https://neo0.ai
