@@ -45,15 +45,17 @@ embedding   →  density-aligned partition  →  recursive coordinate  →  immu
 (meaning vec)   (spherical Voronoi)           (hierarchical address)    (zero drift)
 ```
 
-Real example (measured by the Neo0 engine):
+### Prefix Sharing
 
-| Concept | Coordinate | Territory | Neighbors in the same territory |
-|---|---|---|---|
-| ocean | `[3, 4, 5]` | `3.4` Nature·Matter | sea, water, fish, mountain, forest, snow |
-| king | `[2, 6, ·]` | `2.6` People·Places | david, moses, jerusalem, solomon, pharaoh |
-| love | `[0, 6, ·]` | `0.6` Emotion·Morality | desire, hate, wise, noble, pity, bless |
+Concepts close in meaning share a coordinate prefix and gather in the
+same region. Concepts belonging to nature and matter form one region,
+people and places another, emotion and morality yet another.
 
-That `ocean`, `sea`, `water`, and `fish` gather in the same territory `3.4` is not coincidence — the **proximity of meaning is carried directly into the proximity of coordinates**.
+How many digits of the prefix you read determines the scope of a query.
+A short prefix designates a broad area; a long prefix, a narrow one.
+
+*Actual coordinate values and lattice parameters are not published.
+Evaluation access is provided through the engine API.*
 
 ---
 
