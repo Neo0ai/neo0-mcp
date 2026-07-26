@@ -90,9 +90,10 @@ In one line: where competing approaches *connect or search* meaning, Neo0 *fixes
 
 ## 7. Intellectual property
 
-Neo0's coordinate infrastructure originates from a **recursive spatial partitioning patent registered in 2002** and has expanded through numerous subsequent patents up to 2026 (covering core mechanisms including density-aligned partitioning, the immutable registry, cryptographic erasure by coordinate, and per-model persona control).
-
-To achieve adoption and protection at once, it takes an **open-core** structure. The *interpretation* of coordinates (the MCP interface and client SDK) is open source, while the *generation* of coordinates and coherence computation (partitioning, the immutable registry, the persona engine) is protected as a hosted service. Forking the interface yields an empty shell without the engine, so ecosystem adoption is maximized while the core IP is protected.
+Neo0's coordinate infrastructure originates from a recursive spatial
+partitioning patent granted in 2002 (KR 10-0560735), extended through
+2026 by 58 subsequent patent applications. All subsequent filings
+remain pending; none have yet been granted.
 
 ---
 
